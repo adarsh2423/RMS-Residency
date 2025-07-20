@@ -39,13 +39,13 @@ const Header: React.FC<HeaderProps> = ({ onAdminLogin }) => {
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-lg' : 'bg-white/95 backdrop-blur-sm'
+        isScrolled ? 'bg-white shadow-2xl' : 'bg-white/95 backdrop-blur-2xl'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-blue-600">ComfortStay PG</h1>
+              <h1 className="text-2xl font-bold text-blue-600">RMS Mens PG</h1>
             </div>
 
             {/* Desktop Navigation */}

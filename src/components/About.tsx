@@ -18,7 +18,7 @@ const About: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            About ComfortStay PG
+            About RMS Mens PG
           </h2>
           <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
         </motion.div>
@@ -30,13 +30,13 @@ const About: React.FC = () => {
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p className="text-lg text-gray-700 leading-relaxed">
-              At ComfortStay PG, we believe that finding the right accommodation shouldn't be a compromise. 
+            <p className="text-lg text-gray-700 leading-relaxed text-justify">
+              At RMS Mens PG, we believe that finding the right accommodation shouldn't be a compromise. 
               We provide premium paying guest facilities that combine the warmth of home with modern amenities 
               and professional service. Our commitment to hospitality ensures that every resident feels welcomed, 
               secure, and comfortable throughout their stay.
             </p>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-lg text-gray-700 leading-relaxed text-justify">
               With years of experience in the hospitality industry, we understand the unique needs of students 
               and working professionals. Our service quality is built on trust, cleanliness, security, and 
               community. We maintain the highest standards in accommodation to ensure your peace of mind and 
