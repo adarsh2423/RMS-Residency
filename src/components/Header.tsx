@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, User } from 'lucide-react';
 import AdminLoginModal from './AdminLoginModal';
 
-interface HeaderProps {
-  onAdminLogin: () => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ onAdminLogin }) => {
+const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -39,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onAdminLogin }) => {
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-2xl' : 'bg-white/95 backdrop-blur-2xl'
+        isScrolled ? 'bg-white shadow-lg' : 'bg-white/95 backdrop-blur-sm'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -115,7 +111,6 @@ const Header: React.FC<HeaderProps> = ({ onAdminLogin }) => {
       <AdminLoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onLogin={onAdminLogin}
       />
     </>
   );

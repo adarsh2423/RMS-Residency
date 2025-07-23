@@ -1,13 +1,72 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
-import { branches } from '../data/mockData';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../utils/firebase';
+import { Branch } from '../types';
 
 const FindUs: React.FC = () => {
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [contactInfo, setContactInfo] = useState({
+    phone: '',
+    email: ''
+  });
+  const [loading, setLoading] = useState(true);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    fetchBranches();
+    fetchContactInfo();
+  }, []);
+
+  const fetchBranches = async () => {
+    try {
+      const branchesCollection = collection(db, 'branches');
+      const branchSnapshot = await getDocs(branchesCollection);
+      const branchList = branchSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Branch[];
+      setBranches(branchList);
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchContactInfo = async () => {
+    try {
+      const contactCollection = collection(db, 'contact');
+      const contactSnapshot = await getDocs(contactCollection);
+      if (!contactSnapshot.empty) {
+        const contactData = contactSnapshot.docs[0].data();
+        setContactInfo({
+          phone: contactData.phone || '+1 (555) 123-4567',
+          email: contactData.email || 'info@comfortstay.com'
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching contact info:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="find-us" className="py-16 lg:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading locations...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="find-us" className="py-16 lg:py-24 bg-white" ref={ref}>
@@ -46,11 +105,11 @@ const FindUs: React.FC = () => {
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center space-x-3">
                     <Phone className="text-teal-600" size={18} />
-                    <span className="text-gray-700">+1 (555) 123-4567</span>
+                    <span className="text-gray-700">{contactInfo.phone}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Mail className="text-orange-600" size={18} />
-                    <span className="text-gray-700">info@comfortstay.com</span>
+                    <span className="text-gray-700">{contactInfo.email}</span>
                   </div>
                 </div>
               </div>

@@ -1,13 +1,51 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { branches } from '../data/mockData';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../utils/firebase';
+import { Branch } from '../types';
 
 const Availability: React.FC = () => {
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [loading, setLoading] = useState(true);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    fetchBranches();
+  }, []);
+
+  const fetchBranches = async () => {
+    try {
+      const branchesCollection = collection(db, 'branches');
+      const branchSnapshot = await getDocs(branchesCollection);
+      const branchList = branchSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Branch[];
+      setBranches(branchList);
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="availability" className="py-16 lg:py-24 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading availability...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="availability" className="py-16 lg:py-24 bg-gray-50" ref={ref}>

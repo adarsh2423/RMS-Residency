@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './utils/firebase';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -11,9 +11,9 @@ import FindUs from './components/FindUs';
 import Footer from './components/Footer';
 import AdminPage from './admin/AdminPage';
 
-const HomePage: React.FC<{ onAdminLogin: () => void }> = ({ onAdminLogin }) => (
+const HomePage: React.FC = () => (
   <>
-    <Header onAdminLogin={onAdminLogin} />
+    <Header />
     <main>
       <Hero />
       <About />
@@ -26,21 +26,17 @@ const HomePage: React.FC<{ onAdminLogin: () => void }> = ({ onAdminLogin }) => (
 );
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
+      setUser(user);
       setIsLoading(false);
     });
 
     return unsubscribe;
   }, []);
-
-  const handleAdminLogin = () => {
-    setIsAuthenticated(true);
-  };
 
   if (isLoading) {
     return (
@@ -59,12 +55,12 @@ function App() {
         <Routes>
           <Route 
             path="/" 
-            element={<HomePage onAdminLogin={handleAdminLogin} />} 
+            element={<HomePage />} 
           />
           <Route 
             path="/admin" 
             element={
-              isAuthenticated ? (
+              user ? (
                 <AdminPage />
               ) : (
                 <Navigate to="/" replace />
