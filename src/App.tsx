@@ -9,6 +9,7 @@ import Branches from './components/Branches';
 import Availability from './components/Availability';
 import FindUs from './components/FindUs';
 import Footer from './components/Footer';
+import Review from './components/Review';
 import AdminPage from './admin/AdminPage';
 
 const HomePage: React.FC = () => (
@@ -20,6 +21,7 @@ const HomePage: React.FC = () => (
       <Branches />
       <Availability />
       <FindUs />
+      <Review />
     </main>
     <Footer />
   </>

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -13,14 +11,10 @@ const Branches: React.FC = () => {
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [hasEntered, setHasEntered] = useState(false);
 
   useEffect(() => {
-    fetchBranches();
-  }, []);
-
-  const fetchBranches = async () => {
+    const fetchBranches = async () => {
     try {
       const branchesCollection = collection(db, 'branches');
       const branchSnapshot = await getDocs(branchesCollection);
@@ -35,6 +29,14 @@ const Branches: React.FC = () => {
       setLoading(false);
     }
   };
+    fetchBranches();
+  }, [branches]);
+
+  useEffect(() => {
+    if (!loading && branches.length > 0) {
+      setHasEntered(true);
+    }
+  }, [loading, branches]);
 
   const openGallery = (branchId: string) => {
     setSelectedBranch(branchId);
@@ -44,8 +46,8 @@ const Branches: React.FC = () => {
     setSelectedBranch(null);
   };
 
+  
   const currentBranch = branches.find(branch => branch.id === selectedBranch);
-
   if (loading) {
     return (
       <section id="branches" className="py-16 lg:py-24 bg-white">
@@ -61,12 +63,12 @@ const Branches: React.FC = () => {
 
   return (
     <>
-      <section id="branches" className="py-16 lg:py-24 bg-white" ref={ref}>
+      <section id="branches" className="py-16 lg:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 50 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+            animate={hasEntered ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -85,7 +87,7 @@ const Branches: React.FC = () => {
                 key={branch.id}
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                 initial={{ opacity: 0, y: 50 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+                animate={hasEntered ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
                 transition={{ 
                   duration: 0.6, 
                   delay: 0.2 + (index * 0.1) 

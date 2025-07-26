@@ -387,7 +387,7 @@ const AdminPage: React.FC = () => {
         {activeTab === 'dashboard' && (
           <div>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex items-center">
                   <div className="p-2 bg-blue-100 rounded-lg">
@@ -420,52 +420,6 @@ const AdminPage: React.FC = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Available Beds</p>
                     <p className="text-2xl font-semibold text-gray-900">{totalBeds}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Settings className="text-green-600" size={24} />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Occupancy Rate</p>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      {totalRooms > 0 ? Math.round(((totalRooms - availableRooms) / totalRooms) * 100) : 0}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-              </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-sm text-gray-900">Branch data synced with Firestore Database</p>
-                      <p className="text-xs text-gray-500">Just now</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-sm text-gray-900">Room availability updated</p>
-                      <p className="text-xs text-gray-500">2 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-orange-600 rounded-full mt-2"></div>
-                    <div>
-                      <p className="text-sm text-gray-900">Gallery images updated with base64 storage</p>
-                      <p className="text-xs text-gray-500">1 day ago</p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -903,32 +857,10 @@ const AdminPage: React.FC = () => {
               <div key={branch.id} className="bg-white rounded-lg shadow">
                 <div className="p-6 border-b">
                   <h3 className="text-xl font-semibold text-gray-900">{branch.name} Gallery</h3>
-                  <p className="text-gray-600">Manage photos for this branch (stored as base64 in Firestore)</p>
+                  <p className="text-gray-600">Manage photos for this branch</p>
                 </div>
                 
                 <div className="p-6">
-                  <div className="mb-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={(e) => {
-                            const files = Array.from(e.target.files || []);
-                            files.forEach(file => {
-                              handleImageUpload(file, branch.id, false);
-                            });
-                          }}
-                          className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                        />
-                        {uploadingImage?.includes(branch.id) && (
-                          <span className="text-sm text-green-600">Uploading...</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Main Image Section */}
                   <div className="mb-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">Main Branch Image</h4>
@@ -938,11 +870,11 @@ const AdminPage: React.FC = () => {
                           <img
                             src={branch.mainImage}
                             alt={`${branch.name} - Main`}
-                            className="w-32 h-24 object-cover rounded-lg"
+                            className="w-52 h-40 object-cover rounded-lg"
                           />
                         </div>
                       )}
-                      <div className="flex-1">
+                      <div className="flex">
                         <input
                           type="file"
                           accept="image/*"
@@ -977,6 +909,27 @@ const AdminPage: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                   <div className="mb-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            files.forEach(file => {
+                              handleImageUpload(file, branch.id, false);
+                            });
+                          }}
+                          className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                        />
+                        {uploadingImage?.includes(branch.id) && (
+                          <span className="text-sm text-green-600">Uploading...</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -11,14 +9,10 @@ import { Branch } from '../types';
 const Availability: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [hasEntered, setHasEntered] = useState(false);
 
   useEffect(() => {
-    fetchBranches();
-  }, []);
-
-  const fetchBranches = async () => {
+    const fetchBranches = async () => {
     try {
       const branchesCollection = collection(db, 'branches');
       const branchSnapshot = await getDocs(branchesCollection);
@@ -33,7 +27,15 @@ const Availability: React.FC = () => {
       setLoading(false);
     }
   };
+    fetchBranches();
+  }, [branches]);
 
+   useEffect(() => {
+      if (!loading && branches.length > 0) {
+        setHasEntered(true);
+      }
+    }, [loading, branches]);
+  
   if (loading) {
     return (
       <section id="availability" className="py-16 lg:py-24 bg-gray-50">
@@ -48,12 +50,12 @@ const Availability: React.FC = () => {
   }
 
   return (
-    <section id="availability" className="py-16 lg:py-24 bg-gray-50" ref={ref}>
+    <section id="availability" className="py-16 lg:py-24 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="text-center mb-12"
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          animate={hasEntered ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -71,7 +73,7 @@ const Availability: React.FC = () => {
               key={branch.id} 
               className="bg-white rounded-lg shadow-lg overflow-hidden"
               initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+              animate={hasEntered ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 0.6, delay: 0.2 + (index * 0.1) }}
             >
               <div className="px-6 py-4 bg-blue-600">
