@@ -326,9 +326,6 @@ const AdminPage: React.FC = () => {
   }
 
   const totalRooms = branches.reduce((total, branch) => total + branch.rooms.length, 0);
-  const availableRooms = branches.reduce((total, branch) => 
-    total + branch.rooms.filter(room => room.bedsAvailable > 0).length, 0
-  );
   const totalBeds = branches.reduce((total, branch) => 
     total + branch.rooms.reduce((branchTotal, room) => branchTotal + room.bedsAvailable, 0), 0
   );
@@ -336,7 +333,7 @@ const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div>
@@ -355,9 +352,9 @@ const AdminPage: React.FC = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-8 overflow-x-scroll py-4">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: Settings },
               { id: 'branches', label: 'Branch Management', icon: Building },
