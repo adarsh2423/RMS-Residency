@@ -108,7 +108,7 @@ const Branches: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="p-6">
+                <div className="flex flex-col p-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">{branch.name}</h3>
                   <p className="text-gray-700 leading-relaxed">{branch.description}</p>
                   
@@ -118,6 +118,9 @@ const Branches: React.FC = () => {
                   >
                     <Camera size={20} />
                     <span>View Photos</span>
+                  </button>
+                  <button className='text-blue text-sm text-blue-500 text-start pl-7'>
+                    <a href='https://drive.google.com/drive/folders/1IP2yqH9I_J8ROE3pHKhKnskzgPE52y33?usp=sharing' target='_blank' rel='noopener noreferrer'>Click here to view more</a>
                   </button>
                 </div>
               </motion.div>
