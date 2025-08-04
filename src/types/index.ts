@@ -2,6 +2,7 @@ export interface Room {
   roomNo: string;
   sharingType: string;
   bedsAvailable: number;
+  ac: string;
 }
 
 export interface Branch {

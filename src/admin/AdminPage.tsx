@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
-  setDoc 
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  setDoc
 } from 'firebase/firestore';
 import { auth, db } from '../utils/firebase';
-import { 
-  LogOut, 
-  Users, 
-  Building, 
-  Calendar, 
-  Settings, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
-  X, 
+import {
+  LogOut,
+  Users,
+  Building,
+  Calendar,
+  Settings,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
   Phone,
   Mail,
   MapPin,
@@ -37,12 +37,13 @@ const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingRoom, setEditingRoom] = useState<{ branchId: string; roomIndex: number } | null>(null);
   const [editingBranch, setEditingBranch] = useState<string | null>(null);
-  const [newRoom, setNewRoom] = useState<Room>({ roomNo: '', sharingType: 'Single', bedsAvailable: 1 });
+  const [newRoom, setNewRoom] = useState<Room>({ roomNo: '', sharingType: 'Single', bedsAvailable: 1, ac: 'Non-AC' });
+  const [ac, setAC] = useState(false);
   const [showAddRoom, setShowAddRoom] = useState<string | null>(null);
   const [showAddBranch, setShowAddBranch] = useState(false);
   const [contactInfo, setContactInfo] = useState({
-    phone: '+1 (555) 123-4567',
-    email: 'info@comfortstay.com',
+    phone: '+911234567890',
+    email: 'rmsmenspg@gmail.com',
     address: 'Multiple Locations'
   });
   const [editingContact, setEditingContact] = useState(false);
@@ -137,7 +138,7 @@ const AdminPage: React.FC = () => {
 
     try {
       const base64Image = await convertToBase64(file);
-      
+
       if (isMainImage) {
         await updateBranch(branchId, { mainImage: base64Image });
       } else {
@@ -167,13 +168,13 @@ const AdminPage: React.FC = () => {
 
     try {
       const base64Image = await convertToBase64(file);
-      
+
       if (isMainImage) {
         setNewBranch(prev => ({ ...prev, mainImage: base64Image }));
       } else {
-        setNewBranch(prev => ({ 
-          ...prev, 
-          galleryImages: [...(prev.galleryImages || []), base64Image] 
+        setNewBranch(prev => ({
+          ...prev,
+          galleryImages: [...(prev.galleryImages || []), base64Image]
         }));
       }
     } catch (error) {
@@ -196,12 +197,12 @@ const AdminPage: React.FC = () => {
         galleryImages: newBranch.galleryImages || [],
         rooms: newBranch.rooms || []
       };
-      
+
       const branchesCollection = collection(db, 'branches');
       const docRef = await addDoc(branchesCollection, branchData);
-      
+
       const addedBranch = { id: docRef.id, ...branchData } as Branch;
-      
+
       setBranches(prev => [...prev, addedBranch]);
       setNewBranch({
         name: '',
@@ -236,8 +237,8 @@ const AdminPage: React.FC = () => {
     try {
       const branchRef = doc(db, 'branches', branchId);
       await updateDoc(branchRef, updatedData);
-      
-      setBranches(prev => prev.map(branch => 
+
+      setBranches(prev => prev.map(branch =>
         branch.id === branchId ? { ...branch, ...updatedData } : branch
       ));
     } catch (error) {
@@ -278,8 +279,9 @@ const AdminPage: React.FC = () => {
 
     const updatedRooms = [...branch.rooms, newRoom];
     await updateBranch(branchId, { rooms: updatedRooms });
-    
-    setNewRoom({ roomNo: '', sharingType: 'Single', bedsAvailable: 1 });
+
+    setNewRoom({ roomNo: '', sharingType: 'Single', bedsAvailable: 1, ac: 'Non-AC' });
+    setAC(false);
     setShowAddRoom(null);
   };
 
@@ -326,7 +328,7 @@ const AdminPage: React.FC = () => {
   }
 
   const totalRooms = branches.reduce((total, branch) => total + branch.rooms.length, 0);
-  const totalBeds = branches.reduce((total, branch) => 
+  const totalBeds = branches.reduce((total, branch) =>
     total + branch.rooms.reduce((branchTotal, room) => branchTotal + room.bedsAvailable, 0), 0
   );
 
@@ -365,11 +367,10 @@ const AdminPage: React.FC = () => {
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === id
+                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${activeTab === id
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 <Icon size={16} />
                 <span>{label}</span>
@@ -571,7 +572,7 @@ const AdminPage: React.FC = () => {
                           <div className="space-y-2">
                             <textarea
                               value={branch.description}
-                              onChange={(e) => setBranches(prev => prev.map(b => 
+                              onChange={(e) => setBranches(prev => prev.map(b =>
                                 b.id === branch.id ? { ...b, description: e.target.value } : b
                               ))}
                               className="w-full p-2 border border-gray-300 rounded-lg"
@@ -618,7 +619,7 @@ const AdminPage: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="p-6 bg-gray-50">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
@@ -666,40 +667,49 @@ const AdminPage: React.FC = () => {
                 {showAddRoom === branch.id && (
                   <div className="p-6 bg-gray-50 border-b">
                     <h4 className="font-semibold text-gray-900 mb-4">Add New Room</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                     <div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className='flex flex-col items-center'>
                         <p className="p-2">Room Number</p>
                         <input
-                        type="text"
-                        placeholder="Room Number"
-                        value={newRoom.roomNo}
-                        onChange={(e) => setNewRoom(prev => ({ ...prev, roomNo: e.target.value }))}
-                        className="px-3 py-2 border border-gray-300 rounded-lg"
-                      />
-                     </div>
-                     <div>
-                      <p className='p-2'>Room Sharing Type</p>
-                      <select
-                        value={newRoom.sharingType}
-                        onChange={(e) => setNewRoom(prev => ({ ...prev, sharingType: e.target.value }))}
-                        className="px-3 py-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="Single">Single</option>
-                        <option value="Double">Double</option>
-                        <option value="Triple">Triple</option>
-                        <option value="Quad">Quad</option>
-                      </select>
+                          type="text"
+                          placeholder="Room No"
+                          value={newRoom.roomNo}
+                          onChange={(e) => setNewRoom(prev => ({ ...prev, roomNo: e.target.value }))}
+                          className="px-3 py-2 border border-gray-300 rounded-lg w-[100px] text-center"
+                        />
                       </div>
-                      <div>
+                      <div className='flex flex-col items-center'>
+                        <p className='p-2'>Room Sharing Type</p>
+                        <select
+                          value={newRoom.sharingType}
+                          onChange={(e) => setNewRoom(prev => ({ ...prev, sharingType: e.target.value }))}
+                          className="px-3 py-2 border border-gray-300 rounded-lg"
+                        >
+                          <option value="Single">Single</option>
+                          <option value="Double">Double</option>
+                          <option value="Triple">Triple</option>
+                          <option value="Quad">Quad</option>
+                        </select>
+                      </div>
+                      <div className='flex flex-col items-center hover:cursor-pointer'>
+                        <p className='p-2'>AC/Non-AC</p>
+                        <p className={`mt-2 py-4 mx-1 border rounded-2xl ${ac ? 'bg-black' : 'bg-yellow-200'} w-[80px] md:w-[100px] relative`}>
+                          <p className={ac ? 'text-sm md:text-base text-white w-[50%] absolute z-10 top-0 translate-x-9 md:translate-x-11 transition delay-100 p-1' : 'text-sm md:text-base text-blackw-[50%] absolute z-10 top-0 translate-x-0 transition delay-100 p-1'} onClick={() => {
+                            setAC(prev => !prev);
+                            setNewRoom(prev => ({ ...prev, ac: prev.ac === 'AC' ? 'Non-AC' : 'AC' }));
+                            }}>{ac ? 'AC❄️' : '🌞Non AC'}</p>
+                        </p>
+                      </div>
+                      <div className='flex flex-col items-center'>
                         <p className='p-2'>Beds in room</p>
-                      <input
-                        type="number"
-                        placeholder="Beds Available"
-                        min="0"
-                        value={newRoom.bedsAvailable}
-                        onChange={(e) => setNewRoom(prev => ({ ...prev, bedsAvailable: parseInt(e.target.value) || 0 }))}
-                        className="px-3 py-2 border border-gray-300 rounded-lg"
-                      />
+                        <input
+                          type="number"
+                          placeholder="Beds Available"
+                          min="0"
+                          value={newRoom.bedsAvailable}
+                          onChange={(e) => setNewRoom(prev => ({ ...prev, bedsAvailable: parseInt(e.target.value) || 0 }))}
+                          className="px-2 py-2 border border-gray-300 rounded-lg w-[50px] text-center"
+                        />
                       </div>
                     </div>
                     <div className="flex space-x-2 mt-4">
@@ -726,13 +736,14 @@ const AdminPage: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Room No.</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sharing Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Beds Available</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Room No.</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Sharing Type</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Beds Available</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">AC</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-gray-200 text-center">
                       {branch.rooms.map((room, roomIndex) => (
                         <tr key={roomIndex}>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -740,14 +751,14 @@ const AdminPage: React.FC = () => {
                               <input
                                 type="text"
                                 value={room.roomNo}
-                                onChange={(e) => setBranches(prev => prev.map(b => 
-                                  b.id === branch.id 
-                                    ? { 
-                                        ...b, 
-                                        rooms: b.rooms.map((r, i) => 
-                                          i === roomIndex ? { ...r, roomNo: e.target.value } : r
-                                        )
-                                      }
+                                onChange={(e) => setBranches(prev => prev.map(b =>
+                                  b.id === branch.id
+                                    ? {
+                                      ...b,
+                                      rooms: b.rooms.map((r, i) =>
+                                        i === roomIndex ? { ...r, roomNo: e.target.value } : r
+                                      )
+                                    }
                                     : b
                                 ))}
                                 className="px-2 py-1 border border-gray-300 rounded text-sm"
@@ -760,14 +771,14 @@ const AdminPage: React.FC = () => {
                             {editingRoom?.branchId === branch.id && editingRoom?.roomIndex === roomIndex ? (
                               <select
                                 value={room.sharingType}
-                                onChange={(e) => setBranches(prev => prev.map(b => 
-                                  b.id === branch.id 
-                                    ? { 
-                                        ...b, 
-                                        rooms: b.rooms.map((r, i) => 
-                                          i === roomIndex ? { ...r, sharingType: e.target.value } : r
-                                        )
-                                      }
+                                onChange={(e) => setBranches(prev => prev.map(b =>
+                                  b.id === branch.id
+                                    ? {
+                                      ...b,
+                                      rooms: b.rooms.map((r, i) =>
+                                        i === roomIndex ? { ...r, sharingType: e.target.value } : r
+                                      )
+                                    }
                                     : b
                                 ))}
                                 className="px-2 py-1 border border-gray-300 rounded text-sm"
@@ -787,14 +798,14 @@ const AdminPage: React.FC = () => {
                                 type="number"
                                 min="0"
                                 value={room.bedsAvailable}
-                                onChange={(e) => setBranches(prev => prev.map(b => 
-                                  b.id === branch.id 
-                                    ? { 
-                                        ...b, 
-                                        rooms: b.rooms.map((r, i) => 
-                                          i === roomIndex ? { ...r, bedsAvailable: parseInt(e.target.value) || 0 } : r
-                                        )
-                                      }
+                                onChange={(e) => setBranches(prev => prev.map(b =>
+                                  b.id === branch.id
+                                    ? {
+                                      ...b,
+                                      rooms: b.rooms.map((r, i) =>
+                                        i === roomIndex ? { ...r, bedsAvailable: parseInt(e.target.value) || 0 } : r
+                                      )
+                                    }
                                     : b
                                 ))}
                                 className="px-2 py-1 border border-gray-300 rounded text-sm w-20"
@@ -803,8 +814,33 @@ const AdminPage: React.FC = () => {
                               <span className="text-sm text-gray-700">{room.bedsAvailable}</span>
                             )}
                           </td>
+                          <td className='px-6 py-4 whitespace-nowrap'>
+                            {editingRoom?.branchId === branch.id && editingRoom?.roomIndex === roomIndex ? (
+                              <div className='flex flex-col items-center hover:cursor-pointer'>
+                                <p className={`mt-2 py-4 mx-1 border rounded-2xl ${ac ? 'bg-black' : 'bg-yellow-200'} w-[80px] md:w-[100px] relative`}>
+                                  <p className={ac ? 'text-sm md:text-base text-white w-[50%] absolute z-10 top-0 translate-x-9 md:translate-x-11 transition delay-100 p-1' : 'text-sm md:text-base text-blackw-[50%] absolute z-10 top-0 translate-x-0 transition delay-100 p-1'} onClick={() => {
+                                    setAC(prev => !prev);
+                                    setBranches(prev => prev.map(b =>
+                                      b.id === branch.id
+                                        ? {
+                                          ...b,
+                                          rooms: b.rooms.map((r, i) =>
+                                            i === roomIndex ? { ...r, ac: ac ? 'Non-AC' : 'AC' } : r
+                                          )
+                                        }
+                                        : b
+                                    ));
+                                    }}>{ac ? 'AC❄️' : '🌞Non AC'}</p>
+                                </p>
+                              </div>
+                            ) : (
+                              <span className={`text-sm ${room.ac === 'AC' ? 'text-blue-600' : 'text-yellow-600'}`}>
+                                {room.ac}
+                              </span>
+                            )}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 justify-center">
                               {editingRoom?.branchId === branch.id && editingRoom?.roomIndex === roomIndex ? (
                                 <>
                                   <button
@@ -856,7 +892,7 @@ const AdminPage: React.FC = () => {
                   <h3 className="text-xl font-semibold text-gray-900">{branch.name} Gallery</h3>
                   <p className="text-gray-600">Manage photos for this branch</p>
                 </div>
-                
+
                 <div className="p-6">
                   {/* Main Image Section */}
                   <div className="mb-6">
@@ -907,7 +943,7 @@ const AdminPage: React.FC = () => {
                       </div>
                     ))}
                   </div>
-                   <div className="mb-4">
+                  <div className="mb-4">
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
                         <input
